@@ -27,6 +27,7 @@
   .btn.secondary:hover{background:#f2f2f2;}
 
   .teaser{width:100%;min-height:280px;border-radius:6px;border:1px solid var(--line);overflow:hidden;
+    background:linear-gradient(100deg,#1c2333 0%,#3d5a8a 30%,#8a8478 48%,#8a8478 52%,#d98b3f 70%,#a86a25 100%);
     display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;letter-spacing:0.03em;
     font-family:monospace;margin-bottom:10px;}
   .teaser-caption{font-size:14px;color:var(--muted);text-align:center;max-width:720px;margin:0 auto 60px;}
@@ -136,11 +137,11 @@
       <div class="decomp-cell"><img src="figure/image2_shading.png" alt="Shading of image 2" class="decomp-img"></div>
     </div>
 
-    <p class="sec-desc" style="margin-top:8px;">↓ Vary the exposure to observe how stable the predicted albedo remains.</p>
+    
     <div class="slider-demo">
       <div class="readout" id="evReadout">EV +0.0</div>
       <div class="slider-stage">
-        <div class="half" id="stageInput"><span class="lbl">Input (changes)</span></div>
+        
         <div class="half" id="stageAlbedo" style="background:repeating-linear-gradient(45deg,#8a6a4a,#8a6a4a 12px,#9c7c58 12px,#9c7c58 24px);"><span class="lbl">Predicted Â (constant)</span></div>
       </div>
       <input type="range" id="evSlider" min="-15" max="15" value="0" step="1">
@@ -152,41 +153,9 @@
 <section id="results">
   <div class="container">
     <h2 class="sec-title">Exposure Correction Results</h2>
-    <p class="sec-desc">Comparison with the existing method FECNet shows how reliably EA-IID restores images affected by exposure distortion.</p>
-
-    <div class="restore-set">
-      <div class="set-title">scene · under-exposed input</div>
-      <div class="restore-grid">
-        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#12141a,#232a3a);"><span class="lbl">Input</span></div><div class="foot">raw under-exposed</div></div>
-        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#3a3835,#5a564c);"><span class="lbl">FECNet</span></div><div class="foot">PSNR 20.96 dB</div></div>
-        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#4a473f,#6f6a5c);"><span class="lbl">EA-IID (Ours)</span></div><div class="foot"><b>PSNR 22.92 dB</b></div></div>
-      </div>
-    </div>
-
-    <div class="restore-set">
-      <div class="set-title">scene · over-exposed input</div>
-      <div class="restore-grid">
-        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#e8c98a,#f4dca8);"><span class="lbl">Input</span></div><div class="foot">raw over-exposed</div></div>
-        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#8a7550,#a8935f);"><span class="lbl">FECNet</span></div><div class="foot">PSNR 20.96 dB</div></div>
-        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#6f6a5c,#4a473f);"><span class="lbl">EA-IID (Ours)</span></div><div class="foot"><b>PSNR 22.92 dB</b></div></div>
-      </div>
-    </div>
-
-    <div class="restore-set">
-      <div class="set-title">scene · MSEC benchmark</div>
-      <div class="restore-grid">
-        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#20242c,#3c4658);"><span class="lbl">Input</span></div><div class="foot">raw exposure</div></div>
-        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#54524a,#726c5e);"><span class="lbl">Exposure-Slot</span></div><div class="foot">PSNR 23.18 dB</div></div>
-        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#605c50,#847e6c);"><span class="lbl">EA-IID (Ours)</span></div><div class="foot"><b>PSNR 24.22 dB</b></div></div>
-      </div>
-    </div>
-
-    <div class="metric-row">
-      <div class="metric"><div class="val">24.22<span>dB</span></div><div class="lab">PSNR · MSEC</div></div>
-      <div class="metric"><div class="val">0.9056</div><div class="lab">SSIM · MSEC</div></div>
-      <div class="metric"><div class="val">21.63</div><div class="lab">WHDR ↓ · MAW</div></div>
-      <div class="metric"><div class="val">−7.3<span>%</span></div><div class="lab">Si-MSE vs. RGB-X</div></div>
-    </div>
+    <img src="figure/correction.png"
+         alt="Exposure correction results"
+         style="width:100%;display:block;border:1px solid var(--line);border-radius:6px;">
   </div>
 </section>
 
