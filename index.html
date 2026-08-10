@@ -26,7 +26,7 @@
   .btn.secondary{background:#fff;color:#222;border:1px solid #ccc;}
   .btn.secondary:hover{background:#f2f2f2;}
 
-  .teaser{width:100%;height:280px;border-radius:6px;border:1px solid var(--line);
+  .teaser{width:100%;min-height:280px;border-radius:6px;border:1px solid var(--line);overflow:hidden;
     background:linear-gradient(100deg,#1c2333 0%,#3d5a8a 30%,#8a8478 48%,#8a8478 52%,#d98b3f 70%,#a86a25 100%);
     display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;letter-spacing:0.03em;
     font-family:monospace;margin-bottom:10px;}
@@ -93,7 +93,11 @@
       <a class="btn secondary" href="#">💻 Code</a>
     </div>
 
-    <div class="teaser">Under-exposed &nbsp;→&nbsp; shared albedo Â &nbsp;→&nbsp; Over-exposed</div>
+    <div class="teaser">
+      <img src="figure/Teaser.png"
+           alt="EA-IID teaser"
+           style="width:100%;height:100%;object-fit:contain;display:block;">
+    </div>
     <p class="teaser-caption">Even when the same scene is captured at different exposure levels, the albedo Â predicted by EA-IID remains nearly unchanged. Exposure-dependent variations are absorbed by the shading component.</p>
   </div>
 </header>
@@ -109,7 +113,7 @@
   <div class="container">
     <h2 class="sec-title">Overview</h2>
     <figure style="margin:0;">
-      <img src="overview.png" alt="EA-IID training and inference pipeline overview" style="width:100%;border:1px solid var(--line);border-radius:6px;">
+      <img src="figure/overview.png" alt="EA-IID training and inference pipeline overview" style="width:100%;border:1px solid var(--line);border-radius:6px;">
       <figcaption style="font-size:13.5px;color:var(--muted);text-align:center;margin-top:12px;">During training, bracketed exposures {I_i} are processed by EIAM to predict exposure-invariant albedo Â_i, while ECSM estimates the residual shading Ŝ_i to reconstruct Î_i. During inference, the same pipeline operates from a single input image.</figcaption>
     </figure>
   </div>
