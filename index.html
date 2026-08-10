@@ -27,6 +27,7 @@
   .btn.secondary:hover{background:#f2f2f2;}
 
   .teaser{width:100%;min-height:280px;border-radius:6px;border:1px solid var(--line);overflow:hidden;
+    background:linear-gradient(100deg,#1c2333 0%,#3d5a8a 30%,#8a8478 48%,#8a8478 52%,#d98b3f 70%,#a86a25 100%);
     display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;letter-spacing:0.03em;
     font-family:monospace;margin-bottom:10px;}
   .teaser-caption{font-size:14px;color:var(--muted);text-align:center;max-width:720px;margin:0 auto 60px;}
@@ -83,7 +84,7 @@
 <header class="hero">
   <div class="container">
     <div class="venue">BMVC 2026</div>
-    <h1 class="title">EA-IID: Exposure-Aware Intrinsic Image Decomposition for Exposure Correction</h1>
+    <h1 class="title">EA-IID: Exposure-Aware Intrinsic Image Decomposition<br>for Exposure Correction</h1>
     <div class="authors">Hyunjun Koh, Hyunseo Koh, Heewon Kim</div>
     <div class="affils">Soongsil University, Seoul, Republic of Korea</div>
 
@@ -121,14 +122,14 @@
 <section id="decomposition">
   <div class="container">
     <h2 class="sec-title">Albedo / Shading Decomposition</h2>
-    <p class="sec-desc">The input is decomposed into albedo and shading. The albedo remains nearly invariant across three exposure conditions.</p>
+    <p class="sec-desc">The input is decomposed into albedo (reflectance) and shading (illumination and exposure residuals). The albedo remains nearly invariant across three exposure conditions.</p>
 
     <div class="col-heads"><div>Input</div><div>Predicted Albedo Â</div><div>Predicted Shading Ŝ</div></div>
 
     <div class="decomp-row">
-      <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(180deg,#1c2333,#2b3a55);"><span class="lbl">under · scene A</span></div></div>
-      <div class="decomp-cell"><div class="swatch" style="background:repeating-linear-gradient(45deg,#8a6a4a,#8a6a4a 12px,#9c7c58 12px,#9c7c58 24px);"><span class="lbl">albedo</span></div></div>
-      <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(135deg,#2a2a2a,#565656);"><span class="lbl">shading</span></div></div>
+      <div class="decomp-cell"><img src="figure/image1.png" alt="Input image 1" class="decomp-img"></div>
+      <div class="decomp-cell"><img src="figure/image1_albedo.png" alt="Albedo of image 1" class="decomp-img"></div>
+      <div class="decomp-cell"><img src="figure/image1_shading.png" alt="Shading of image 1" class="decomp-img"></div>
     </div>
     <div class="decomp-row">
       <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(180deg,#4a4844,#6b6560);"><span class="lbl">canonical · scene A</span></div></div>
@@ -136,9 +137,9 @@
       <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(135deg,#3d3d3d,#787878);"><span class="lbl">shading</span></div></div>
     </div>
     <div class="decomp-row">
-      <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(180deg,#8a6a34,#d98b3f);"><span class="lbl">over · scene A</span></div></div>
-      <div class="decomp-cell"><div class="swatch" style="background:repeating-linear-gradient(45deg,#8a6a4a,#8a6a4a 12px,#9c7c58 12px,#9c7c58 24px);"><span class="lbl">albedo (same)</span></div></div>
-      <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(135deg,#5a4620,#c98f45);"><span class="lbl">shading</span></div></div>
+      <div class="decomp-cell"><img src="figure/image2.png" alt="Input image 2" class="decomp-img"></div>
+      <div class="decomp-cell"><img src="figure/image2_albedo.png" alt="Albedo of image 2" class="decomp-img"></div>
+      <div class="decomp-cell"><img src="figure/image2_shading.png" alt="Shading of image 2" class="decomp-img"></div>
     </div>
 
     <p class="sec-desc" style="margin-top:8px;">↓ Vary the exposure to observe how stable the predicted albedo remains.</p>
