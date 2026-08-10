@@ -5,57 +5,139 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EA-IID: Exposure-Aware Intrinsic Image Decomposition for Exposure Correction</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --text:#222; --muted:#5f6368; --line:#e6e6e6; --bg-soft:#f7f8fa;
-    --under:#3d5a8a; --over:#d98b3f; --albedo:#8a6a4a; --shading:#565656;
+    --text:#1c1d20;
+    --muted:#6b6d74;
+    --muted-2:#93959c;
+    --line:#e8e8ea;
+    --bg-soft:#f7f7f9;
+    --accent:#c8712f;      /* warm exposure accent */
+    --accent-2:#3d5a8a;    /* cool under-exposure accent */
+    --sans:'Inter',Arial,sans-serif;
+    --serif:'Fraunces',serif;
+    --mono:'IBM Plex Mono',monospace;
+    --radius:10px;
+    --shadow: 0 1px 2px rgba(20,20,25,0.04), 0 6px 20px rgba(20,20,25,0.05);
   }
   *{box-sizing:border-box;}
-  body{margin:0;font-family:'Noto Sans',Arial,sans-serif;color:var(--text);line-height:1.65;background:#fff;}
-  .container{max-width:960px;margin:0 auto;padding:0 24px;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;font-family:var(--sans);color:var(--text);
+    line-height:1.7;background:#fff;font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .container{max-width:960px;margin:0 auto;padding:0 28px;}
 
-  header.hero{padding:60px 0 30px;text-align:center;}
-  .venue{font-size:16px;color:var(--muted);margin-bottom:16px;}
-  h1.title{font-size:29px;font-weight:600;margin:0 0 20px;line-height:1.35;max-width:760px;margin-left:auto;margin-right:auto;}
-  .authors{font-size:16px;margin-bottom:6px;}
-  .affils{font-size:14.5px;color:var(--muted);margin-bottom:32px;}
-  .btn-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:40px;}
-  .btn{display:inline-flex;align-items:center;gap:8px;background:#222;color:#fff;padding:9px 22px;border-radius:20px;font-size:14px;font-weight:500;text-decoration:none;}
-  .btn:hover{background:#000;}
-  .btn.secondary{background:#fff;color:#222;border:1px solid #ccc;}
-  .btn.secondary:hover{background:#f2f2f2;}
+  /* subtle sticky nav */
+  nav.subnav{
+    position:sticky;top:0;z-index:40;
+    background:rgba(255,255,255,0.86);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  nav.subnav .container{display:flex;justify-content:center;gap:32px;padding:14px 28px;}
+  nav.subnav a{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:0.04em;color:var(--muted);
+    text-decoration:none;text-transform:uppercase;transition:color .15s;
+  }
+  nav.subnav a:hover{color:var(--accent);}
 
-  .teaser{width:100%;min-height:280px;border-radius:6px;border:1px solid var(--line);overflow:hidden;
-    display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;letter-spacing:0.03em;
-    font-family:monospace;margin-bottom:10px;}
-  .teaser-caption{font-size:14px;color:var(--muted);text-align:center;max-width:720px;margin:0 auto 60px;}
+  /* HERO */
+  header.hero{padding:72px 0 36px;text-align:center;}
+  .venue-badge{
+    display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:0.1em;
+    color:var(--accent);border:1px solid rgba(200,113,47,0.35);background:rgba(200,113,47,0.06);
+    padding:5px 14px;border-radius:20px;margin-bottom:24px;text-transform:uppercase;
+  }
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(28px,4vw,40px);
+    line-height:1.28;margin:0 0 24px;letter-spacing:-0.01em;max-width:760px;
+    margin-left:auto;margin-right:auto;color:#111214;
+  }
+  .authors{font-size:16px;margin-bottom:6px;font-weight:500;}
+  .affils{font-size:14px;color:var(--muted);margin-bottom:30px;}
+  .btn-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:48px;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:#17181b;color:#fff;padding:10px 22px;border-radius:22px;
+    font-size:13.5px;font-weight:500;text-decoration:none;transition:all .18s;
+    border:1px solid #17181b;
+  }
+  .btn:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-1px);}
+  .btn.secondary{background:#fff;color:var(--text);border:1px solid #d7d7da;}
+  .btn.secondary:hover{background:var(--bg-soft);color:var(--text);border-color:#c7c7cb;transform:translateY(-1px);}
 
-  section{max-width:960px;margin:0 auto;padding:48px 24px;border-top:1px solid var(--line);}
-  h2.sec-title{font-size:23px;font-weight:600;text-align:center;margin:0 0 8px;}
-  p.sec-desc{text-align:center;color:var(--muted);font-size:14.5px;max-width:660px;margin:0 auto 32px;}
-  .abstract p{font-size:15.5px;color:#333;max-width:760px;margin:0 auto;}
+  .teaser{
+    width:100%;border-radius:var(--radius);overflow:hidden;margin-bottom:16px;
+    box-shadow:var(--shadow);border:1px solid var(--line);
+  }
+  .teaser img{width:100%;display:block;}
+  .teaser-caption{
+    font-size:14px;color:var(--muted);text-align:center;max-width:680px;
+    margin:0 auto 64px;padding-top:2px;
+  }
 
-  /* decomposition gallery: input -> albedo -> shading, multiple rows */
-  .decomp-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
-  .decomp-cell{border:1px solid var(--line);border-radius:6px;overflow:hidden;}
-  .decomp-cell .swatch{height:150px;position:relative;}
-  .decomp-cell .lbl{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,0.55);color:#fff;
-    font-size:11px;padding:3px 8px;border-radius:3px;font-family:monospace;}
-  @media(max-width:640px){.decomp-row{grid-template-columns:1fr;}}
+  section{max-width:960px;margin:0 auto;padding:60px 28px;}
+  section + section{border-top:1px solid var(--line);}
+  .kicker{
+    text-align:center;font-family:var(--mono);font-size:11.5px;letter-spacing:0.14em;
+    color:var(--accent);text-transform:uppercase;margin-bottom:12px;
+  }
+  h2.sec-title{
+    font-family:var(--serif);font-size:clamp(22px,2.6vw,28px);font-weight:600;
+    text-align:center;margin:0 0 12px;color:#111214;
+  }
+  p.sec-desc{
+    text-align:center;color:var(--muted);font-size:15px;max-width:640px;
+    margin:0 auto 40px;
+  }
+  .abstract p{
+    font-size:16px;color:#3a3b3f;max-width:740px;margin:0 auto;
+  }
+  .abstract b{color:var(--text);}
 
-  .col-heads{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;text-align:center;}
-  .col-heads div{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:0.03em;text-transform:uppercase;}
-  @media(max-width:640px){.col-heads{display:none;}}
+  figure{margin:0;}
+  figure img{width:100%;display:block;border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);}
+  figcaption{font-size:13.5px;color:var(--muted);text-align:center;margin-top:16px;max-width:760px;margin-left:auto;margin-right:auto;}
 
-  footer{text-align:center;padding:36px 24px;color:var(--muted);font-size:13px;}
+  /* decomposition gallery */
+  .col-heads{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:12px;text-align:center;}
+  .col-heads div{
+    font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:500;
+    letter-spacing:0.06em;text-transform:uppercase;
+  }
+  .decomp-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+  .decomp-cell{
+    border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);
+    box-shadow:var(--shadow);background:#f2f2f4;transition:transform .18s;
+  }
+  .decomp-cell:hover{transform:translateY(-2px);}
+  .decomp-cell img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;}
+  @media(max-width:640px){
+    .decomp-row,.col-heads{grid-template-columns:1fr;}
+    .col-heads div:not(:first-child){display:none;}
+  }
+
+  /* results */
+  .results-figure{margin-top:8px;}
+
+  footer{text-align:center;padding:48px 28px 60px;color:var(--muted-2);font-size:12.5px;font-family:var(--mono);}
 </style>
 </head>
 <body>
 
+<nav class="subnav">
+  <div class="container">
+    <a href="#overview-fig">Overview</a>
+    <a href="#decomposition">Decomposition</a>
+    <a href="#results">Results</a>
+  </div>
+</nav>
+
 <header class="hero">
   <div class="container">
-    <div class="venue">BMVC 2026</div>
+    <span class="venue-badge">BMVC 2026</span>
     <h1 class="title">EA-IID: Exposure-Aware Intrinsic Image Decomposition<br>for Exposure Correction</h1>
     <div class="authors">Hyunjun Koh, Hyunseo Koh, Heewon Kim</div>
     <div class="affils">Soongsil University, Seoul, Republic of Korea</div>
@@ -66,66 +148,63 @@
     </div>
 
     <div class="teaser">
-      <img src="figure/Teaser.png"
-           alt="EA-IID teaser"
-           style="width:100%;height:100%;object-fit:contain;display:block;">
+      <img src="figure/Teaser.png" alt="EA-IID teaser comparison">
     </div>
-    <p class="teaser-caption">Even when the same scene is captured at different exposure levels, the albedo Â predicted by EA-IID remains nearly unchanged. Exposure-dependent variations are absorbed by the shading component.</p>
+    <p class="teaser-caption">Even when the same scene is captured at different exposure levels, the albedo Â predicted by EA-IID remains nearly unchanged. Exposure-dependent variations are absorbed by the shading component.</p>
   </div>
 </header>
 
 <section class="abstract">
+  <div class="kicker">Abstract</div>
   <div class="container">
-    <h2 class="sec-title">Abstract</h2>
     <p>Exposure correction aims to recover visually faithful images from under- or over-exposed inputs. Existing methods often entangle exposure-dependent illumination with intrinsic scene reflectance, leading to unstable restoration. We revisit this task from the perspective of intrinsic image decomposition and propose <b>Exposure-Aware Intrinsic Image Decomposition (EA-IID)</b>, a framework that explicitly enforces exposure-invariant albedo while using shading to model the residual photometric transformation toward canonical exposure. To achieve this, our approach leverages uncertainty-aware pseudo-supervision and cross-exposure consistency regularization, enabling robust learning without ground-truth albedo annotations. Extensive experiments show that EA-IID improves albedo consistency across exposure variations and achieves strong exposure-correction performance on multiple benchmarks, highlighting the benefit of explicitly modeling exposure-invariant intrinsic structure.</p>
   </div>
 </section>
 
 <section id="overview-fig">
+  <div class="kicker">Method</div>
+  <h2 class="sec-title">Overview</h2>
   <div class="container">
-    <h2 class="sec-title">Overview</h2>
-    <figure style="margin:0;">
-      <img src="figure/overview.png" alt="EA-IID training and inference pipeline overview" style="width:100%;border:1px solid var(--line);border-radius:6px;">
-      <figcaption style="font-size:13.5px;color:var(--muted);text-align:center;margin-top:12px;">During training, bracketed exposures {I_i} are processed by EIAM to predict exposure-invariant albedo Â_i, while ECSM estimates the residual shading Ŝ_i to reconstruct Î_i. During inference, the same pipeline operates from a single input image.</figcaption>
+    <figure>
+      <img src="figure/overview.png" alt="EA-IID training and inference pipeline overview">
+      <figcaption>During training, bracketed exposures {I<sub>i</sub>} are processed by EIAM to predict exposure-invariant albedo Â<sub>i</sub>, while ECSM estimates the residual shading Ŝ<sub>i</sub> to reconstruct Î<sub>i</sub>. During inference, the same pipeline operates from a single input image.</figcaption>
     </figure>
   </div>
 </section>
 
 <section id="decomposition">
+  <div class="kicker">Visualization</div>
+  <h2 class="sec-title">Albedo / Shading Decomposition</h2>
+  <p class="sec-desc">The input is decomposed into albedo (reflectance) and shading (illumination and exposure residuals). The albedo remains nearly invariant across different exposure conditions.</p>
+
   <div class="container">
-    <h2 class="sec-title">Albedo / Shading Decomposition</h2>
-    <p class="sec-desc">The input is decomposed into albedo (reflectance) and shading (illumination and exposure residuals). The albedo remains nearly invariant across different exposure conditions.</p>
-
-    <div class="col-heads"><div>Input</div><div>Predicted Albedo Â</div><div>Predicted Shading Ŝ</div></div>
+    <div class="col-heads"><div>Input</div><div>Predicted Albedo Â</div><div>Predicted Shading Ŝ</div></div>
 
     <div class="decomp-row">
-      <div class="decomp-cell"><img src="figure/image1.png" alt="Input image 1" class="decomp-img"></div>
-      <div class="decomp-cell"><img src="figure/image1_albedo.png" alt="Albedo of image 1" class="decomp-img"></div>
-      <div class="decomp-cell"><img src="figure/image1_shading.png" alt="Shading of image 1" class="decomp-img"></div>
+      <div class="decomp-cell"><img src="figure/image1.png" alt="Input image 1"></div>
+      <div class="decomp-cell"><img src="figure/image1_albedo.png" alt="Albedo of image 1"></div>
+      <div class="decomp-cell"><img src="figure/image1_shading.png" alt="Shading of image 1"></div>
     </div>
     <div class="decomp-row">
-      <div class="decomp-cell"><img src="figure/image2.png" alt="Input image 2" class="decomp-img"></div>
-      <div class="decomp-cell"><img src="figure/image2_albedo.png" alt="Albedo of image 2" class="decomp-img"></div>
-      <div class="decomp-cell"><img src="figure/image2_shading.png" alt="Shading of image 2" class="decomp-img"></div>
+      <div class="decomp-cell"><img src="figure/image2.png" alt="Input image 2"></div>
+      <div class="decomp-cell"><img src="figure/image2_albedo.png" alt="Albedo of image 2"></div>
+      <div class="decomp-cell"><img src="figure/image2_shading.png" alt="Shading of image 2"></div>
     </div>
-
-    
-
   </div>
 </section>
 
 <section id="results">
-  <div class="container">
-    <h2 class="sec-title">Exposure Correction Results</h2>
-    <img src="figure/correction.png"
-         alt="Exposure correction results"
-         style="width:100%;display:block;border:1px solid var(--line);border-radius:6px;">
+  <div class="kicker">Benchmark</div>
+  <h2 class="sec-title">Exposure Correction Results</h2>
+  <p class="sec-desc">Qualitative comparison against state-of-the-art exposure correction methods, evaluated against expert-retouched references.</p>
+  <div class="container results-figure">
+    <figure>
+      <img src="figure/correction.png" alt="Exposure correction results comparison">
+    </figure>
   </div>
 </section>
 
 <footer>© 2026 the authors.</footer>
-
-
 
 </body>
 </html>
