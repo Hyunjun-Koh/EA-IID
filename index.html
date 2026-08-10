@@ -48,33 +48,6 @@
   .col-heads div{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:0.03em;text-transform:uppercase;}
   @media(max-width:640px){.col-heads{display:none;}}
 
-  /* before/after restoration gallery */
-  .restore-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-  .restore-cell{border:1px solid var(--line);border-radius:6px;overflow:hidden;}
-  .restore-cell .swatch{height:170px;position:relative;}
-  .restore-cell .lbl{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,0.55);color:#fff;
-    font-size:11px;padding:3px 8px;border-radius:3px;font-family:monospace;}
-  .restore-cell .foot{padding:8px 12px;font-size:12.5px;color:var(--muted);text-align:center;background:#fafafa;}
-  @media(max-width:640px){.restore-grid{grid-template-columns:1fr;}}
-  .restore-set{margin-bottom:34px;}
-  .restore-set .set-title{font-size:13px;color:var(--muted);margin-bottom:10px;font-family:monospace;}
-
-  /* interactive exposure slider */
-  .slider-demo{border:1px solid var(--line);border-radius:6px;padding:22px;background:var(--bg-soft);max-width:720px;margin:0 auto;}
-  .slider-stage{height:220px;border-radius:4px;position:relative;overflow:hidden;background:#111;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;}
-  .slider-stage .half{position:relative;}
-  .slider-stage .lbl{position:absolute;bottom:10px;left:10px;color:#fff;font-family:monospace;font-size:11.5px;background:rgba(0,0,0,0.45);padding:3px 8px;border-radius:3px;}
-  input[type=range]{width:100%;}
-  .scale-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px;font-family:monospace;}
-  .readout{text-align:center;font-family:monospace;font-size:13px;color:var(--under);margin-bottom:10px;}
-
-  /* metric highlight numbers */
-  .metric-row{display:flex;justify-content:center;gap:56px;flex-wrap:wrap;margin-top:10px;}
-  .metric{text-align:center;}
-  .metric .val{font-size:36px;font-weight:700;color:#222;}
-  .metric .val span{color:var(--over);}
-  .metric .lab{font-size:12px;color:var(--muted);margin-top:4px;font-family:monospace;letter-spacing:0.02em;}
-
   footer{text-align:center;padding:36px 24px;color:var(--muted);font-size:13px;}
 </style>
 </head>
@@ -137,15 +110,7 @@
     </div>
 
     
-    <div class="slider-demo">
-      <div class="readout" id="evReadout">EV +0.0</div>
-      <div class="slider-stage">
-        
-        <div class="half" id="stageAlbedo" style="background:repeating-linear-gradient(45deg,#8a6a4a,#8a6a4a 12px,#9c7c58 12px,#9c7c58 24px);"><span class="lbl">Predicted Â (constant)</span></div>
-      </div>
-      <input type="range" id="evSlider" min="-15" max="15" value="0" step="1">
-      <div class="scale-row"><span>Under −1.5EV</span><span>Canonical</span><span>Over +1.5EV</span></div>
-    </div>
+
   </div>
 </section>
 
@@ -160,24 +125,7 @@
 
 <footer>© 2026 the authors.</footer>
 
-<script>
-  const slider = document.getElementById('evSlider');
-  const readout = document.getElementById('evReadout');
-  const stage = document.getElementById('stageInput');
-  function update(v){
-    const ev=(v/10).toFixed(1);
-    readout.textContent='EV '+(v>0?'+':'')+ev;
-    const t=(v+15)/30;
-    const under=[28,32,40], mid=[74,71,63], over=[217,139,63];
-    let c1;
-    if(t<0.5){const k=t/0.5;c1=under.map((c,i)=>Math.round(c+(mid[i]-c)*k));}
-    else{const k=(t-0.5)/0.5;c1=mid.map((c,i)=>Math.round(c+(over[i]-c)*k));}
-    const c2=c1.map(c=>Math.max(0,Math.round(c*0.55)));
-    stage.style.background=`linear-gradient(180deg, rgb(${c1.join(',')}), rgb(${c2.join(',')}))`;
-  }
-  slider.addEventListener('input', e=>update(parseInt(e.target.value)));
-  update(0);
-</script>
+
 
 </body>
 </html>
