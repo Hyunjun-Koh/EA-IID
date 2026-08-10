@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EA-IID: Exposure-Aware Intrinsic Image Decomposition for Exposure Correction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --text:#222; --muted:#5f6368; --line:#e6e6e6; --bg-soft:#f7f8fa;
+    --under:#3d5a8a; --over:#d98b3f; --albedo:#8a6a4a; --shading:#565656;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Noto Sans',Arial,sans-serif;color:var(--text);line-height:1.65;background:#fff;}
+  .container{max-width:960px;margin:0 auto;padding:0 24px;}
+
+  header.hero{padding:60px 0 30px;text-align:center;}
+  .venue{font-size:16px;color:var(--muted);margin-bottom:16px;}
+  h1.title{font-size:29px;font-weight:600;margin:0 0 20px;line-height:1.35;max-width:760px;margin-left:auto;margin-right:auto;}
+  .authors{font-size:16px;margin-bottom:6px;}
+  .affils{font-size:14.5px;color:var(--muted);margin-bottom:32px;}
+  .btn-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:40px;}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:#222;color:#fff;padding:9px 22px;border-radius:20px;font-size:14px;font-weight:500;text-decoration:none;}
+  .btn:hover{background:#000;}
+  .btn.secondary{background:#fff;color:#222;border:1px solid #ccc;}
+  .btn.secondary:hover{background:#f2f2f2;}
+
+  .teaser{width:100%;height:280px;border-radius:6px;border:1px solid var(--line);
+    background:linear-gradient(100deg,#1c2333 0%,#3d5a8a 30%,#8a8478 48%,#8a8478 52%,#d98b3f 70%,#a86a25 100%);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;letter-spacing:0.03em;
+    font-family:monospace;margin-bottom:10px;}
+  .teaser-caption{font-size:14px;color:var(--muted);text-align:center;max-width:720px;margin:0 auto 60px;}
+
+  section{max-width:960px;margin:0 auto;padding:48px 24px;border-top:1px solid var(--line);}
+  h2.sec-title{font-size:23px;font-weight:600;text-align:center;margin:0 0 8px;}
+  p.sec-desc{text-align:center;color:var(--muted);font-size:14.5px;max-width:660px;margin:0 auto 32px;}
+  .abstract p{font-size:15.5px;color:#333;max-width:760px;margin:0 auto;}
+
+  /* decomposition gallery: input -> albedo -> shading, multiple rows */
+  .decomp-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+  .decomp-cell{border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  .decomp-cell .swatch{height:150px;position:relative;}
+  .decomp-cell .lbl{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,0.55);color:#fff;
+    font-size:11px;padding:3px 8px;border-radius:3px;font-family:monospace;}
+  @media(max-width:640px){.decomp-row{grid-template-columns:1fr;}}
+
+  .col-heads{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;text-align:center;}
+  .col-heads div{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:0.03em;text-transform:uppercase;}
+  @media(max-width:640px){.col-heads{display:none;}}
+
+  /* before/after restoration gallery */
+  .restore-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .restore-cell{border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  .restore-cell .swatch{height:170px;position:relative;}
+  .restore-cell .lbl{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,0.55);color:#fff;
+    font-size:11px;padding:3px 8px;border-radius:3px;font-family:monospace;}
+  .restore-cell .foot{padding:8px 12px;font-size:12.5px;color:var(--muted);text-align:center;background:#fafafa;}
+  @media(max-width:640px){.restore-grid{grid-template-columns:1fr;}}
+  .restore-set{margin-bottom:34px;}
+  .restore-set .set-title{font-size:13px;color:var(--muted);margin-bottom:10px;font-family:monospace;}
+
+  /* interactive exposure slider */
+  .slider-demo{border:1px solid var(--line);border-radius:6px;padding:22px;background:var(--bg-soft);max-width:720px;margin:0 auto;}
+  .slider-stage{height:220px;border-radius:4px;position:relative;overflow:hidden;background:#111;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;}
+  .slider-stage .half{position:relative;}
+  .slider-stage .lbl{position:absolute;bottom:10px;left:10px;color:#fff;font-family:monospace;font-size:11.5px;background:rgba(0,0,0,0.45);padding:3px 8px;border-radius:3px;}
+  input[type=range]{width:100%;}
+  .scale-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px;font-family:monospace;}
+  .readout{text-align:center;font-family:monospace;font-size:13px;color:var(--under);margin-bottom:10px;}
+
+  /* metric highlight numbers */
+  .metric-row{display:flex;justify-content:center;gap:56px;flex-wrap:wrap;margin-top:10px;}
+  .metric{text-align:center;}
+  .metric .val{font-size:36px;font-weight:700;color:#222;}
+  .metric .val span{color:var(--over);}
+  .metric .lab{font-size:12px;color:var(--muted);margin-top:4px;font-family:monospace;letter-spacing:0.02em;}
+
+  footer{text-align:center;padding:36px 24px;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <div class="venue">BMVC 2026</div>
+    <h1 class="title">EA-IID: Exposure-Aware Intrinsic Image Decomposition<br>for Exposure Correction</h1>
+    <div class="authors">Hyunjun Koh, Hyunseo Koh, Heewon Kim</div>
+    <div class="affils">Soongsil University, Seoul, Republic of Korea</div>
+
+    <div class="btn-row">
+      <a class="btn" href="#">📄 Paper</a>
+      <a class="btn secondary" href="#">💻 Code</a>
+    </div>
+
+    <div class="teaser">Under-exposed &nbsp;→&nbsp; shared albedo Â &nbsp;→&nbsp; Over-exposed</div>
+    <p class="teaser-caption">동일 장면을 서로 다른 노출로 촬영해도, EA-IID가 예측하는 알베도 Â는 거의 변하지 않습니다. 노출에 따라 변하는 정보는 셰이딩이 흡수합니다.</p>
+  </div>
+</header>
+
+<section class="abstract">
+  <div class="container">
+    <h2 class="sec-title">Abstract</h2>
+    <p>Exposure correction aims to recover visually faithful images from under- or over-exposed inputs. Existing methods often entangle exposure-dependent illumination with intrinsic scene reflectance, leading to unstable restoration. We revisit this task from the perspective of intrinsic image decomposition and propose <b>Exposure-Aware Intrinsic Image Decomposition (EA-IID)</b>, a framework that explicitly enforces exposure-invariant albedo while using shading to model the residual photometric transformation toward canonical exposure. To achieve this, our approach leverages uncertainty-aware pseudo-supervision and cross-exposure consistency regularization, enabling robust learning without ground-truth albedo annotations. Extensive experiments show that EA-IID improves albedo consistency across exposure variations and achieves strong exposure-correction performance on multiple benchmarks, highlighting the benefit of explicitly modeling exposure-invariant intrinsic structure.</p>
+  </div>
+</section>
+
+<section id="overview-fig">
+  <div class="container">
+    <h2 class="sec-title">Overview</h2>
+    <figure style="margin:0;">
+      <img src="assets/overview.png" alt="EA-IID training and inference pipeline overview" style="width:100%;border:1px solid var(--line);border-radius:6px;">
+      <figcaption style="font-size:13.5px;color:var(--muted);text-align:center;margin-top:12px;">Training 단계에서는 브라켓 노출 {I_i}가 EIAM을 거쳐 노출-불변 알베도 Â_i를 예측하고, ECSM이 잔차 셰이딩 Ŝ_i를 계산해 재구성 Î_i를 만듭니다. Inference 단계에서는 단일 이미지만으로 동일한 파이프라인이 동작합니다.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="decomposition">
+  <div class="container">
+    <h2 class="sec-title">Albedo / Shading Decomposition</h2>
+    <p class="sec-desc">입력을 알베도(반사율)와 셰이딩(조명·노출 잔차)으로 분리합니다. 알베도는 세 가지 노출 조건에서 모두 거의 동일하게 유지됩니다.</p>
+
+    <div class="col-heads"><div>Input</div><div>Predicted Albedo Â</div><div>Predicted Shading Ŝ</div></div>
+
+    <div class="decomp-row">
+      <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(180deg,#1c2333,#2b3a55);"><span class="lbl">under · scene A</span></div></div>
+      <div class="decomp-cell"><div class="swatch" style="background:repeating-linear-gradient(45deg,#8a6a4a,#8a6a4a 12px,#9c7c58 12px,#9c7c58 24px);"><span class="lbl">albedo</span></div></div>
+      <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(135deg,#2a2a2a,#565656);"><span class="lbl">shading</span></div></div>
+    </div>
+    <div class="decomp-row">
+      <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(180deg,#4a4844,#6b6560);"><span class="lbl">canonical · scene A</span></div></div>
+      <div class="decomp-cell"><div class="swatch" style="background:repeating-linear-gradient(45deg,#8a6a4a,#8a6a4a 12px,#9c7c58 12px,#9c7c58 24px);"><span class="lbl">albedo (same)</span></div></div>
+      <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(135deg,#3d3d3d,#787878);"><span class="lbl">shading</span></div></div>
+    </div>
+    <div class="decomp-row">
+      <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(180deg,#8a6a34,#d98b3f);"><span class="lbl">over · scene A</span></div></div>
+      <div class="decomp-cell"><div class="swatch" style="background:repeating-linear-gradient(45deg,#8a6a4a,#8a6a4a 12px,#9c7c58 12px,#9c7c58 24px);"><span class="lbl">albedo (same)</span></div></div>
+      <div class="decomp-cell"><div class="swatch" style="background:linear-gradient(135deg,#5a4620,#c98f45);"><span class="lbl">shading</span></div></div>
+    </div>
+
+    <p class="sec-desc" style="margin-top:8px;">↓ 직접 노출을 바꿔가며 알베도가 얼마나 안정적인지 확인해보세요.</p>
+    <div class="slider-demo">
+      <div class="readout" id="evReadout">EV +0.0</div>
+      <div class="slider-stage">
+        <div class="half" id="stageInput"><span class="lbl">Input (changes)</span></div>
+        <div class="half" id="stageAlbedo" style="background:repeating-linear-gradient(45deg,#8a6a4a,#8a6a4a 12px,#9c7c58 12px,#9c7c58 24px);"><span class="lbl">Predicted Â (constant)</span></div>
+      </div>
+      <input type="range" id="evSlider" min="-15" max="15" value="0" step="1">
+      <div class="scale-row"><span>Under −1.5EV</span><span>Canonical</span><span>Over +1.5EV</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="container">
+    <h2 class="sec-title">Exposure Correction Results</h2>
+    <p class="sec-desc">기존 방법(FECNet) 대비, EA-IID가 노출 왜곡을 얼마나 안정적으로 복원하는지 비교합니다.</p>
+
+    <div class="restore-set">
+      <div class="set-title">scene · under-exposed input</div>
+      <div class="restore-grid">
+        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#12141a,#232a3a);"><span class="lbl">Input</span></div><div class="foot">raw under-exposed</div></div>
+        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#3a3835,#5a564c);"><span class="lbl">FECNet</span></div><div class="foot">PSNR 20.96 dB</div></div>
+        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#4a473f,#6f6a5c);"><span class="lbl">EA-IID (Ours)</span></div><div class="foot"><b>PSNR 22.92 dB</b></div></div>
+      </div>
+    </div>
+
+    <div class="restore-set">
+      <div class="set-title">scene · over-exposed input</div>
+      <div class="restore-grid">
+        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#e8c98a,#f4dca8);"><span class="lbl">Input</span></div><div class="foot">raw over-exposed</div></div>
+        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#8a7550,#a8935f);"><span class="lbl">FECNet</span></div><div class="foot">PSNR 20.96 dB</div></div>
+        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#6f6a5c,#4a473f);"><span class="lbl">EA-IID (Ours)</span></div><div class="foot"><b>PSNR 22.92 dB</b></div></div>
+      </div>
+    </div>
+
+    <div class="restore-set">
+      <div class="set-title">scene · MSEC benchmark</div>
+      <div class="restore-grid">
+        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#20242c,#3c4658);"><span class="lbl">Input</span></div><div class="foot">raw exposure</div></div>
+        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#54524a,#726c5e);"><span class="lbl">Exposure-Slot</span></div><div class="foot">PSNR 23.18 dB</div></div>
+        <div class="restore-cell"><div class="swatch" style="background:linear-gradient(180deg,#605c50,#847e6c);"><span class="lbl">EA-IID (Ours)</span></div><div class="foot"><b>PSNR 24.22 dB</b></div></div>
+      </div>
+    </div>
+
+    <div class="metric-row">
+      <div class="metric"><div class="val">24.22<span>dB</span></div><div class="lab">PSNR · MSEC</div></div>
+      <div class="metric"><div class="val">0.9056</div><div class="lab">SSIM · MSEC</div></div>
+      <div class="metric"><div class="val">21.63</div><div class="lab">WHDR ↓ · MAW</div></div>
+      <div class="metric"><div class="val">−7.3<span>%</span></div><div class="lab">Si-MSE vs. RGB-X</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 the authors.</footer>
+
+<script>
+  const slider = document.getElementById('evSlider');
+  const readout = document.getElementById('evReadout');
+  const stage = document.getElementById('stageInput');
+  function update(v){
+    const ev=(v/10).toFixed(1);
+    readout.textContent='EV '+(v>0?'+':'')+ev;
+    const t=(v+15)/30;
+    const under=[28,32,40], mid=[74,71,63], over=[217,139,63];
+    let c1;
+    if(t<0.5){const k=t/0.5;c1=under.map((c,i)=>Math.round(c+(mid[i]-c)*k));}
+    else{const k=(t-0.5)/0.5;c1=mid.map((c,i)=>Math.round(c+(over[i]-c)*k));}
+    const c2=c1.map(c=>Math.max(0,Math.round(c*0.55)));
+    stage.style.background=`linear-gradient(180deg, rgb(${c1.join(',')}), rgb(${c2.join(',')}))`;
+  }
+  slider.addEventListener('input', e=>update(parseInt(e.target.value)));
+  update(0);
+</script>
+
+</body>
+</html>
